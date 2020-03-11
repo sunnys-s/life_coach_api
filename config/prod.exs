@@ -12,7 +12,7 @@ use Mix.Config
 config :life_coach_api, LifeCoachApiWeb.Endpoint,
   # url: [host: "example.com", port: 80],
   http: [port: {:system, "PORT"}],
-  url: [scheme: "https", host: "mysterious-meadow-6277.herokuapp.com", port: 443],
+  url: [scheme: "https", host: "life-coach-api.herokuapp.com", port: 443],
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
