@@ -2,7 +2,7 @@ defmodule LifeCoachApiWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :life_coach_api
 
   socket "/socket", LifeCoachApiWeb.UserSocket,
-    websocket: true,
+    websocket: [timeout: 45_000],
     longpoll: false
 
   # Serve at "/" the static files from "priv/static" directory.
