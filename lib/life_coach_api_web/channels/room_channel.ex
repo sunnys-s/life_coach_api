@@ -20,17 +20,17 @@ defmodule LifeCoachApiWeb.RoomChannel do
   # It is also common to receive messages from the client and
   # broadcast to everyone in the current topic (room:lobby).
   def handle_in("shout", payload, socket) do
-    LifeCoachApi.Message.changeset(%LifeCoachApi.Message{}, payload) |> LifeCoachApi.Repo.insert  
-    broadcast socket, "shout", payload
+    # LifeCoachApi.Message.changeset(%LifeCoachApi.Message{}, payload) |> LifeCoachApi.Repo.insert
+    broadcast socket, payload["name"], payload
     {:noreply, socket}
   end
 
   def handle_info(:after_join, socket) do
-    LifeCoachApi.Message.get_messages()
-    |> Enum.each(fn msg -> push(socket, "shout", %{
-        name: msg.name,
-        message: msg.message,
-      }) end)
+    # LifeCoachApi.Message.get_messages()
+    # |> Enum.each(fn msg -> push(socket, "shout", %{
+    #     name: msg.name,
+    #     message: msg.message,
+    #   }) end)
     {:noreply, socket} # :noreply
   end
 
