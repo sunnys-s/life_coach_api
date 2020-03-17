@@ -42,5 +42,10 @@ defmodule LifeCoachApiWeb.Router do
     pipe_through [:api, :jwt_authenticated]
 
     get "/my_user", UserController, :show
+    resources "/templates", TemplateController, except: [:new, :edit]
+    resources "/questions", QuestionController, except: [:new, :edit]
+    scope "/questions" do
+      get "/template_questions/:template_id", QuestionController, :template_questions
+    end
   end
 end
