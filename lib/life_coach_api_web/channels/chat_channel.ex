@@ -18,7 +18,7 @@ defmodule LifeCoachApiWeb.ChatChannel do
       room = String.replace_prefix(socket.topic, "chat:", "")
       IO.inspect room
       messages = Repo.all(from m in Conversation, where: m.room == ^room, order_by: [desc: m.sent_at], preload: [:user, :opponent]) 
-      |> Enum.map(fn m -> %{_id: m.id, sent_at: m.sent_at, text: m.text, user: %{_id: m.opponent.id}} end)
+      |> Enum.map(fn m -> %{_id: m.id, sent_at: m.sent_at, text: m.text, user: %{_id: m.opponent_id}} end)
 
       IO.inspect messages
       push socket, "init:msg", %{messages: messages}
