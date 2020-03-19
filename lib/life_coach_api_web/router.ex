@@ -36,6 +36,9 @@ defmodule LifeCoachApiWeb.Router do
     post "/sign_in", UserController, :sign_in
     get "/user_conversations", UserController, :user_conversations
     get "/users_of_contacts", UserController, :users_of_contacts
+    get "/users", UserController, :index
+    put "/users/:id", UserController, :update
+    put "/users/:id/images", UserController, :update_image
   end
 
   scope "/api/v1", LifeCoachApiWeb do

@@ -11,9 +11,10 @@ defmodule LifeCoachApi.Application do
       # Start the Ecto repository
       LifeCoachApi.Repo,
       # Start the endpoint when the application starts
-      LifeCoachApiWeb.Endpoint
+      LifeCoachApiWeb.Endpoint,
       # Starts a worker by calling: LifeCoachApi.Worker.start_link(arg)
       # {LifeCoachApi.Worker, arg},
+      LifeCoachApiWeb.Presence
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -30,6 +30,13 @@ config :life_coach_api, LifeCoachApi.Guardian,
   issuer: "lifeCoachApi",
   secret_key: "Ji/+HzNoJhwJabK4QFPIyiYhAXKDx5vFGr54LeU/+CW+J0HmBsqA/G15nq8hjMQW"
 
+config :arc,
+  bucket: System.get_env("AWS_BUCKET")
+
+config :ex_aws,
+  access_key_id: System.get_env("AWS_ACCESS_KEY"),
+  secret_access_key: System.get_env("AWS_SECRET_KEY"),
+  region: System.get_env("S3_REGION")
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
