@@ -108,7 +108,8 @@ defmodule LifeCoachApi.Accounts do
   def token_sign_in(email, password) do
     case email_password_auth(email, password) do
       {:ok, user} ->
-        Guardian.encode_and_sign(user)
+        {:ok, token, _claims} = Guardian.encode_and_sign(user)
+        {:ok, token, user}
       _ ->
         {:error, :unauthorized}
     end

@@ -23,8 +23,7 @@ defmodule LifeCoachApiWeb.UserController do
 
     with {:ok, %User{} = user} <- Accounts.create_user(user_params),
          {:ok, token, _claims} <- Guardian.encode_and_sign(user) do
-      IO.inspect(token)
-      conn |> render("jwt.json", jwt: token)
+      conn |> render("jwt.json", jwt: token, user: user)
     end
   end
 
@@ -67,8 +66,8 @@ defmodule LifeCoachApiWeb.UserController do
 
   def sign_in(conn, %{"email" => email, "password" => password}) do
     case Accounts.token_sign_in(email, password) do
-      {:ok, token, _claims} ->
-        conn |> render("jwt.json", jwt: token)
+      {:ok, token, user} ->
+        conn |> render("jwt.json", jwt: token, user: user)
       _ ->
         {:error, :unauthorized}
     end
