@@ -73,6 +73,14 @@ defmodule LifeCoachApiWeb.UserController do
     end
   end
 
+  def upsert_templates(conn, %{"id" => id, "user" => user_params}) do
+    user = Accounts.get_user!(id)
+    IO.inspect user_params
+    with {:ok, %User{} = user} <- Accounts.insert_template_users(user, user_params["template_ids"]) do
+      render(conn, "show.json", user: user)
+    end
+  end
+
   def user_conversations(conn, _params) do
     render(conn, "user_conversations.json")
   end

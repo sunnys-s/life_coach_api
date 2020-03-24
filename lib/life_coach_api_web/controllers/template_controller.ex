@@ -42,4 +42,16 @@ defmodule LifeCoachApiWeb.TemplateController do
       send_resp(conn, :no_content, "")
     end
   end
+
+  def user_template_lists(conn, _) do
+    user = Guardian.Plug.current_resource(conn)
+    templates = Survey.user_templates(user)
+    render(conn, "index.json", templates: templates)
+  end
+
+  def coach_template_lists(conn, _) do
+    user = Guardian.Plug.current_resource(conn)
+    templates = Survey.coach_templates(user)
+    render(conn, "index.json", templates: templates)
+  end
 end

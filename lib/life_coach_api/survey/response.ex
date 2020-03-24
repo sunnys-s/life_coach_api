@@ -7,11 +7,14 @@ defmodule LifeCoachApi.Survey.Response do
     field :type, :string
     field :value, :string
     field :weight, :integer
-    field :template_id, :id
+    # field :template_id, :id
     field :user_id, :id
-    field :question_id, :id
+    # field :question_id, :id
 
     timestamps()
+
+    belongs_to :question, LifeCoachApi.Survey.Question
+    belongs_to :template, LifeCoachApi.Survey.Template
   end
 
   @doc false

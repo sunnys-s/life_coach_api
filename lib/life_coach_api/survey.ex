@@ -307,4 +307,41 @@ defmodule LifeCoachApi.Survey do
   def change_response(%Response{} = response) do
     Response.changeset(response, %{})
   end
+
+  def list_feedbacks_by_template(template_id, user_id) do
+    res = Repo.all from r in Response, where: r.template_id == ^template_id and r.user_id == ^user_id, preload: [:question]
+    res |> Enum.map(fn(r) ->  Map.put(r.question, :value, r.value) end)
+  end
+
+  def bulk_upsert(template_id, user, feedbacks) do
+    timestamp = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+    new_feedback_params = feedbacks |> Enum.map(fn(fb) -> 
+      %{
+        question_id: fb["id"], 
+        value: fb["value"], 
+        template_id: (template_id |> String.to_integer), 
+        user_id: user.id, 
+        weight: fb["weight"], 
+        type: fb["type"], 
+        rating: 0, 
+        inserted_at: timestamp, 
+        updated_at: timestamp
+      } 
+    end)
+    Repo.insert_all(Response, new_feedback_params, on_conflict: :nothing)
+    res = Repo.all from r in Response, where: r.template_id == ^String.to_integer(template_id), preload: [:question]
+    res |> Enum.map(fn(r) ->  Map.put(r.question, :value, r.value) end)
+  end
+
+  def user_templates(user) do
+    u = user |> Repo.preload([:templates])
+    u.templates
+  end
+
+  def coach_templates(user) do
+    templates =
+      Template
+      |> where([template], template.user_id == ^user.id)
+      |> Repo.all()
+  end
 end

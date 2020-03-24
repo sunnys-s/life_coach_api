@@ -14,7 +14,8 @@ defmodule LifeCoachApiWeb.UserView do
     %{id: user.id,
       name: user.name,
       email: user.email,
-      profile_picture: user.profile_picture
+      profile_picture: user.profile_picture,
+      user_type: user.user_type
     }
   end
 

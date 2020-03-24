@@ -2,6 +2,7 @@ defmodule LifeCoachApi.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
   alias LifeCoachApi.Accounts.User
+  alias LifeCoachApi.Survey.Template
 
   import Comeonin.Bcrypt, only: [hashpwsalt: 1]
 
@@ -14,22 +15,36 @@ defmodule LifeCoachApi.Accounts.User do
     field :password, :string, virtual: true
     field :password_confirmation, :string, virtual: true
     field :profile_picture, :string
+    field :user_type, :string
     timestamps()
 
     has_many :conversations, LifeCoachApi.Conversation
+
+    many_to_many(
+      :templates,
+      Template,
+      join_through: "template_user",
+      on_replace: :delete
+    )
     
   end
 
   @doc false
   def changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:name, :email, :password, :password_confirmation, :profile_picture])
+    |> cast(attrs, [:name, :email, :password, :password_confirmation, :profile_picture, :user_type])
     # |> validate_required([:email, :password, :password_confirmation])
     |> validate_format(:email, ~r/@/)
     |> validate_length(:password, min: 8)
     |> validate_confirmation(:password)
     |> unique_constraint(:email)
     |> put_password_hash
+  end
+
+  def changeset_update_templates(%User{} = user, templates) do
+    user
+    |> cast(%{}, [:name, :email, :password, :password_confirmation, :profile_picture, :user_type])
+    |> put_assoc(:templates, templates)
   end
 
   defp put_password_hash(changeset) do

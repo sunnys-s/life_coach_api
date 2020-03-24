@@ -7,6 +7,8 @@ defmodule LifeCoachApi.Accounts do
   alias LifeCoachApi.Repo
 
   alias LifeCoachApi.Accounts.User
+  alias LifeCoachApi.Survey.Template
+  alias LifeCoachApi.Accounts
 
   alias LifeCoachApi.Guardian
   import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
@@ -232,5 +234,42 @@ defmodule LifeCoachApi.Accounts do
   """
   def change_profile(%Profile{} = profile) do
     Profile.changeset(profile, %{})
+  end
+
+  def upsert_template_users(user, template_ids) when is_list(template_ids) do
+    templates =
+      Template
+      |> where([template], template.id in ^template_ids)
+      |> Repo.all()
+
+    with {:ok, _struct} <-
+           user
+           |> Repo.preload([:templates])
+           |> User.changeset_update_templates(templates)
+           |> Repo.update() do
+      {:ok, Accounts.get_user!(user.id)}
+    else
+      error ->
+        error
+    end
+  end
+
+  def insert_template_users(user, template_ids) when is_list(template_ids) do
+    templates =
+      Template
+      |> where([template], template.id in ^template_ids)
+      |> Repo.all()
+    old_templates = (user |> Repo.preload([:templates])).templates
+    merged = templates ++ old_templates
+    with {:ok, _struct} <-
+        user
+        |> Repo.preload([:templates])
+        |> User.changeset_update_templates(merged)
+        |> Repo.update() do
+      {:ok, Accounts.get_user!(user.id)}
+    else
+      error ->
+        error
+    end
   end
 end

@@ -7,16 +7,18 @@ defmodule LifeCoachApi.Survey.Question do
     field :type, :string
     field :value, :string
     field :weight, :integer
-    field :template_id, :id
+    field :sequence, :integer
+    # field :template_id, :id
 
     timestamps()
+    belongs_to :template, LifeCoachApi.Survey.Template
     embeds_many(:options, LifeCoachApi.Survey.Option)
   end
 
   @doc false
   def changeset(question, attrs) do
     question
-    |> cast(attrs, [:statement, :type, :weight, :value, :template_id])
+    |> cast(attrs, [:statement, :type, :weight, :value, :template_id, :sequence])
     |> cast_embed(:options)
     |> validate_required([:statement, :type, :weight, :value])
   end

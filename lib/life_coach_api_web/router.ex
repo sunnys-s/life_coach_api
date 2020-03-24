@@ -39,6 +39,7 @@ defmodule LifeCoachApiWeb.Router do
     get "/users", UserController, :index
     put "/users/:id", UserController, :update
     put "/users/:id/images", UserController, :update_image
+    put "/users/:id/upsert_templates", UserController, :upsert_templates
   end
 
   scope "/api/v1", LifeCoachApiWeb do
@@ -46,9 +47,23 @@ defmodule LifeCoachApiWeb.Router do
 
     get "/my_user", UserController, :show
     resources "/templates", TemplateController, except: [:new, :edit]
+    scope "/templates" do
+      get "/my_templates/coach", TemplateController, :coach_template_lists
+      get "/my_templates/user", TemplateController, :user_template_lists
+    end
+
     resources "/questions", QuestionController, except: [:new, :edit]
     scope "/questions" do
       get "/template_questions/:template_id", QuestionController, :template_questions
+      post "/template_feedbacks/:template_id", QuestionController, :bulk_upsert
     end
+
+    resources "/responses", ResponseController, except: [:new, :edit]
+    scope "/responses" do
+      get "/feedbacks/:template_id", ResponseController, :feedbacks
+      post "/:template_id/bulk_upsert", ResponseController, :bulk_upsert
+    end
+
+    
   end
 end
