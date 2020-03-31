@@ -6,6 +6,7 @@ defmodule LifeCoachApiWeb.UserSocket do
   channel "room:lobby", LifeCoachApiWeb.RoomChannel
   channel "user:*", LifeCoachApiWeb.UserChannel
   channel "chat:*", LifeCoachApiWeb.ChatChannel
+  channel "status:*", LifeCoachApiWeb.StatusChannel
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After

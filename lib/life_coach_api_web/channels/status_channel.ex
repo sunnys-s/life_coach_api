@@ -16,25 +16,24 @@ defmodule LifeCoachApiWeb.StatusChannel do
     end
   
     def handle_info(:after_join, socket) do
-    #   room = String.replace_prefix(socket.topic, "chat:", "")
-    #   IO.inspect room
-    #   messages = Repo.all(from m in Conversation, where: m.room == ^room, order_by: [desc: m.sent_at], preload: [:user, :opponent]) 
-    #   |> Enum.map(fn m -> %{_id: m.id, sent_at: m.sent_at, text: m.text, user: %{_id: m.opponent_id}} end)
-
-    #   IO.inspect messages
-
-      users = Repo.all |> Enum.map(fn u -> 
-        query = from m in Conversation, where: m.user_id == ^socket.assigns.user_id and m.opponent_id == ^u.id and m.is_read == false
+      user = Repo.get!(User, socket.assigns.user_id)
+      user_list = Repo.all(from u in User, where: u.user_type != ^user.user_type) |> Enum.map(fn u -> 
+        query = from m in Conversation, where: m.opponent_id== ^socket.assigns.user_id and m.user_id == ^u.id and m.is_read == false
+        query_d = from m in Conversation, where: m.opponent_id== ^socket.assigns.user_id and m.user_id == ^u.id and m.is_read == false, order_by: [desc: m.sent_at]
         count = Repo.aggregate(query, :count)
+        last = Repo.all(query_d) |> List.first
+        sent_at = if last == nil, do: nil, else: last.sent_at
         %{
           id: u.id,
           name: u.name,
           email: u.email,
           profile_picture: u.profile_picture,
           user_type: u.user_type,
-          count: count
+          count: count,
+          sent_at: sent_at
         }
       end)
+      users = Enum.sort_by(user_list, &(&1.sent_at)) |> Enum.reverse
       push socket, "init:status_msg", %{users: users}
       Presence.track(socket, socket.assigns.user_id, %{})
       {:noreply, socket}

@@ -21,6 +21,8 @@ defmodule LifeCoachApiWeb.ChatChannel do
       |> Enum.map(fn m -> %{_id: m.id, createdAt: m.sent_at, text: m.text, user: %{_id: m.opponent_id, name: m.opponent.name}} end)
 
       IO.inspect messages
+      unread_query = from m in Conversation, where: m.room == ^room and m.opponent_id == ^socket.assigns.user_id
+      Repo.update_all(unread_query, set: [is_read: true])
       push socket, "init:msg", %{messages: messages}
       Presence.track(socket, socket.assigns.user_id, %{})
       {:noreply, socket}
