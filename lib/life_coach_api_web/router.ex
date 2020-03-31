@@ -36,7 +36,7 @@ defmodule LifeCoachApiWeb.Router do
     post "/sign_in", UserController, :sign_in
     get "/user_conversations", UserController, :user_conversations
     get "/users_of_contacts", UserController, :users_of_contacts
-    get "/users", UserController, :index
+    # get "/users", UserController, :index
     put "/users/:id", UserController, :update
     put "/users/:id/images", UserController, :update_image
     put "/users/:id/upsert_templates", UserController, :upsert_templates
@@ -44,7 +44,7 @@ defmodule LifeCoachApiWeb.Router do
 
   scope "/api/v1", LifeCoachApiWeb do
     pipe_through [:api, :jwt_authenticated]
-
+    get "/users", UserController, :index
     get "/my_user", UserController, :show
     resources "/templates", TemplateController, except: [:new, :edit]
     scope "/templates" do

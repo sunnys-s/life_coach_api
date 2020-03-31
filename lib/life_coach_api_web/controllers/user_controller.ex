@@ -9,7 +9,8 @@ defmodule LifeCoachApiWeb.UserController do
   action_fallback LifeCoachApiWeb.FallbackController
 
   def index(conn, _params) do
-    users = Accounts.list_users()
+    user = Guardian.Plug.current_resource(conn)
+    users = Accounts.list_users(user)
     render(conn, "index.json", users: users)
   end
 

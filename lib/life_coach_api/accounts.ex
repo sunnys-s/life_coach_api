@@ -9,6 +9,7 @@ defmodule LifeCoachApi.Accounts do
   alias LifeCoachApi.Accounts.User
   alias LifeCoachApi.Survey.Template
   alias LifeCoachApi.Accounts
+  alias LifeCoachApi.Conversation
 
   alias LifeCoachApi.Guardian
   import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
@@ -22,8 +23,28 @@ defmodule LifeCoachApi.Accounts do
       [%User{}, ...]
 
   """
-  def list_users do
-    Repo.all(User)
+  def list_users(user) do
+    # query = from m in Conversation, where: m.user_id== 13 and m.opponent_id == 1 and m.is_read == false
+    # Repo.aggregate(query, :count)
+    IO.inspect user
+    users = Repo.all(User)
+    users |> Enum.map(fn u -> 
+      query = from m in Conversation, where: m.user_id== ^user.id and m.opponent_id == ^u.id and m.is_read == false
+      query_d = from m in Conversation, where: m.user_id== ^user.id and m.opponent_id == ^u.id and m.is_read == false, order_by: [desc: m.sent_at]
+      count = Repo.aggregate(query, :count)
+      last = Repo.all(query_d) |> List.first
+      sent_at = if last == nil, do: nil, else: last.sent_at
+      %{
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        profile_picture: u.profile_picture,
+        user_type: u.user_type,
+        count: count,
+        sent_at: sent_at
+      }
+    end)
+    
   end
 
   @doc """

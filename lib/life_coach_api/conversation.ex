@@ -8,6 +8,7 @@ defmodule LifeCoachApi.Conversation do
     field :room, :string
     field :sent_at, :naive_datetime
     field :text, :string
+    field :is_read, :boolean, default: false
     # field :user_id, :integer
 
     timestamps()

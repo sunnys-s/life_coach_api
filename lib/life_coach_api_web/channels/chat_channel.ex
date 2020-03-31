@@ -18,7 +18,7 @@ defmodule LifeCoachApiWeb.ChatChannel do
       room = String.replace_prefix(socket.topic, "chat:", "")
       IO.inspect room
       messages = Repo.all(from m in Conversation, where: m.room == ^room, order_by: [desc: m.sent_at], preload: [:user, :opponent]) 
-      |> Enum.map(fn m -> %{_id: m.id, sent_at: m.sent_at, text: m.text, user: %{_id: m.opponent_id}} end)
+      |> Enum.map(fn m -> %{_id: m.id, createdAt: m.sent_at, text: m.text, user: %{_id: m.opponent_id, name: m.opponent.name}} end)
 
       IO.inspect messages
       push socket, "init:msg", %{messages: messages}
@@ -43,7 +43,7 @@ defmodule LifeCoachApiWeb.ChatChannel do
                    }
         case Conversation.changeset(%Conversation{}, changes) |> Repo.insert do
           {:ok, message} ->
-            broadcast! socket, "new:msg", %{_id: message.id, sent_at: message.sent_at, text: message.text, user: %{_id: message.opponent_id}}
+            broadcast! socket, "new:msg", %{_id: message.id, createdAt: message.sent_at, text: message.text, user: %{_id: message.opponent_id}}
             # --------------------
             if Enum.count(Presence.list(socket)) == 1 do
                 LifeCoachApiWeb.Endpoint.broadcast!("user:#{opponent_id}", "new:msg", %{user_id: socket.assigns.user_id})

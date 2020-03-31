@@ -3,7 +3,7 @@ defmodule LifeCoachApiWeb.UserView do
   alias LifeCoachApiWeb.UserView
 
   def render("index.json", %{users: users}) do
-    %{data: render_many(users, UserView, "user.json")}
+    %{data: render_many(users, UserView, "new_user.json")}
   end
 
   def render("show.json", %{user: user}) do
@@ -16,6 +16,17 @@ defmodule LifeCoachApiWeb.UserView do
       email: user.email,
       profile_picture: user.profile_picture,
       user_type: user.user_type
+    }
+  end
+
+  def render("new_user.json", %{user: user}) do
+    %{id: user[:id],
+      name: user[:name],
+      email: user[:email],
+      profile_picture: user[:profile_picture],
+      user_type: user[:user_type],
+      count: user[:count],
+      sent_at: user[:sent_at]
     }
   end
 
