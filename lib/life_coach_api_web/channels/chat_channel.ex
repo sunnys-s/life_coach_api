@@ -1,6 +1,8 @@
 defmodule LifeCoachApiWeb.ChatChannel do
     use Phoenix.Channel
     alias LifeCoachApi.{Repo,Conversation}
+    alias LifeCoachApi.Accounts.User
+    alias LifeCoachApi.Accounts
     import Ecto.Query, only: [from: 2]
 
     alias LifeCoachApiWeb.Presence
@@ -16,15 +18,13 @@ defmodule LifeCoachApiWeb.ChatChannel do
   
     def handle_info(:after_join, socket) do
       room = String.replace_prefix(socket.topic, "chat:", "")
-      IO.inspect room
       messages = Repo.all(from m in Conversation, where: m.room == ^room, order_by: [desc: m.sent_at], preload: [:user, :opponent]) 
       |> Enum.map(fn m -> %{_id: m.id, createdAt: m.sent_at, text: m.text, user: %{_id: m.opponent_id, name: m.opponent.name}} end)
-
-      IO.inspect messages
       unread_query = from m in Conversation, where: m.room == ^room and m.opponent_id == ^socket.assigns.user_id
       Repo.update_all(unread_query, set: [is_read: true])
       push socket, "init:msg", %{messages: messages}
       Presence.track(socket, socket.assigns.user_id, %{})
+      # LifeCoachApiWeb.Endpoint.broadcast!("status:13:Sunny","read_msg", %{users: %{}})
       {:noreply, socket}
     end
     
@@ -46,9 +46,12 @@ defmodule LifeCoachApiWeb.ChatChannel do
         case Conversation.changeset(%Conversation{}, changes) |> Repo.insert do
           {:ok, message} ->
             broadcast! socket, "new:msg", %{_id: message.id, createdAt: message.sent_at, text: message.text, user: %{_id: message.opponent_id}}
+            IO.inspect opponent_id
+            IO.inspect socket.assigns.user_id
+            LifeCoachApiWeb.Endpoint.broadcast!("status:#{opponent_id}", "unread:msg", %{id: socket.assigns.user_id})
             # --------------------
             if Enum.count(Presence.list(socket)) == 1 do
-                LifeCoachApiWeb.Endpoint.broadcast!("user:#{opponent_id}", "new:msg", %{user_id: socket.assigns.user_id})
+              LifeCoachApiWeb.Endpoint.broadcast!("user:#{opponent_id}", "new:msg", %{user_id: socket.assigns.user_id})
             end
             # --------------------
           {:error, _changeset} -> nil
