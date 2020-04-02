@@ -18,6 +18,7 @@ defmodule LifeCoachApiWeb.QuestionView do
       weight: question.weight,
       value: question.value,
       template_id: question.template_id,
+      sequence: question.sequence,
       options: render_many(question.options, QuestionView, "option.json")
     }
   end

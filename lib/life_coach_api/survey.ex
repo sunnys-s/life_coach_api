@@ -37,6 +37,12 @@ defmodule LifeCoachApi.Survey do
   """
   def get_template!(id), do: Repo.get!(Template, id)
 
+  def get_template_with_questions(id) do 
+    template = Repo.get!(Template, id) |> Repo.preload([:questions])
+    IO.inspect(template)
+    template
+  end
+
   @doc """
   Creates a template.
 
@@ -127,7 +133,7 @@ defmodule LifeCoachApi.Survey do
 
   """
   def list_questions_by_template(template_id) do
-    query = from q in Question, where: q.template_id == ^template_id
+    query = from q in Question, where: q.template_id == ^template_id, order_by: q.sequence
     Repo.all(query)
   end
 
@@ -310,7 +316,7 @@ defmodule LifeCoachApi.Survey do
 
   def list_feedbacks_by_template(template_id, user_id) do
     res = Repo.all from r in Response, where: r.template_id == ^template_id and r.user_id == ^user_id, preload: [:question]
-    res |> Enum.map(fn(r) ->  Map.put(r.question, :value, r.value) end)
+    res |> Enum.map(fn(r) ->  Map.put(r.question, :value, r.value) end) |> Enum.sort_by(&(&1.sequence))
   end
 
   def bulk_upsert(template_id, user, feedbacks) do

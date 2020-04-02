@@ -22,9 +22,14 @@ defmodule LifeCoachApiWeb.TemplateController do
     end
   end
 
+  # def show(conn, %{"id" => id}) do
+  #   template = Survey.get_template!(id)
+  #   render(conn, "show.json", template: template)
+  # end
+
   def show(conn, %{"id" => id}) do
-    template = Survey.get_template!(id)
-    render(conn, "show.json", template: template)
+    template = Survey.get_template_with_questions(id)
+    render(conn, "template_show.json", template: template)
   end
 
   def update(conn, %{"id" => id, "template" => template_params}) do
