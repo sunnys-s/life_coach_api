@@ -31,8 +31,9 @@ defmodule LifeCoachApi.Accounts do
     user_list = users |> Enum.map(fn u -> 
       query = from m in Conversation, where: m.opponent_id== ^user.id and m.user_id == ^u.id and m.is_read == false
       query_d = from m in Conversation, where: m.opponent_id== ^user.id and m.user_id == ^u.id and m.is_read == false, order_by: [desc: m.sent_at]
+      query_sent_at = from m in Conversation, where: ((m.opponent_id== ^user.id and m.user_id == ^u.id) or (m.opponent_id== ^u.id and m.user_id == ^user.id)), order_by: [desc: m.sent_at]
       count = Repo.aggregate(query, :count)
-      last = Repo.all(query_d) |> List.first
+      last = Repo.all(query_sent_at) |> List.first
       sent_at = if last == nil, do: nil, else: last.sent_at
       %{
         id: u.id,
