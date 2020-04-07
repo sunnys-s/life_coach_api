@@ -19,6 +19,7 @@ defmodule LifeCoachApi.Accounts.User do
     timestamps()
 
     has_many :conversations, LifeCoachApi.Conversation
+    has_many :survey_templates, LifeCoachApi.Survey.SurveyTemplate
 
     many_to_many(
       :templates,

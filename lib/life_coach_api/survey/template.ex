@@ -16,7 +16,7 @@ defmodule LifeCoachApi.Survey.Template do
       join_through: "template_user",
       on_replace: :delete
     )
-    has_many :questions, LifeCoachApi.Survey.Question
+    has_many :questions, LifeCoachApi.Survey.Question, on_replace: :nilify
   end
 
   @doc false

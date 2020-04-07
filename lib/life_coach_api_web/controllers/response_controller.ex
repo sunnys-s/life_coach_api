@@ -43,13 +43,13 @@ defmodule LifeCoachApiWeb.ResponseController do
 
   def feedbacks(conn, %{"template_id" => template_id}) do
     user = Guardian.Plug.current_resource(conn)
-    questions = Survey.list_feedbacks_by_template(template_id, user.id)
+    questions = Survey.list_feedbacks_by_survey_template(template_id, user.id)
     render(conn, LifeCoachApiWeb.QuestionView, "index.json", questions: questions)
   end
 
   def bulk_upsert(conn, %{"template_id" => template_id, "feedbacks" => feedback_params}) do
     user = Guardian.Plug.current_resource(conn)
-    questions = Survey.bulk_upsert(template_id, user, feedback_params)
+    questions = Survey.bulk_upsert_responses(template_id, user, feedback_params)
     render(conn, LifeCoachApiWeb.QuestionView, "index.json", questions: questions)
   end
 end

@@ -191,4 +191,63 @@ defmodule LifeCoachApi.SurveyTest do
       assert %Ecto.Changeset{} = Survey.change_response(response)
     end
   end
+
+  describe "survey_templates" do
+    alias LifeCoachApi.Survey.SurveyTemplate
+
+    @valid_attrs %{name: "some name"}
+    @update_attrs %{name: "some updated name"}
+    @invalid_attrs %{name: nil}
+
+    def survey_template_fixture(attrs \\ %{}) do
+      {:ok, survey_template} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Survey.create_survey_template()
+
+      survey_template
+    end
+
+    test "list_survey_templates/0 returns all survey_templates" do
+      survey_template = survey_template_fixture()
+      assert Survey.list_survey_templates() == [survey_template]
+    end
+
+    test "get_survey_template!/1 returns the survey_template with given id" do
+      survey_template = survey_template_fixture()
+      assert Survey.get_survey_template!(survey_template.id) == survey_template
+    end
+
+    test "create_survey_template/1 with valid data creates a survey_template" do
+      assert {:ok, %SurveyTemplate{} = survey_template} = Survey.create_survey_template(@valid_attrs)
+      assert survey_template.name == "some name"
+    end
+
+    test "create_survey_template/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Survey.create_survey_template(@invalid_attrs)
+    end
+
+    test "update_survey_template/2 with valid data updates the survey_template" do
+      survey_template = survey_template_fixture()
+      assert {:ok, %SurveyTemplate{} = survey_template} = Survey.update_survey_template(survey_template, @update_attrs)
+      assert survey_template.name == "some updated name"
+    end
+
+    test "update_survey_template/2 with invalid data returns error changeset" do
+      survey_template = survey_template_fixture()
+      assert {:error, %Ecto.Changeset{}} = Survey.update_survey_template(survey_template, @invalid_attrs)
+      assert survey_template == Survey.get_survey_template!(survey_template.id)
+    end
+
+    test "delete_survey_template/1 deletes the survey_template" do
+      survey_template = survey_template_fixture()
+      assert {:ok, %SurveyTemplate{}} = Survey.delete_survey_template(survey_template)
+      assert_raise Ecto.NoResultsError, fn -> Survey.get_survey_template!(survey_template.id) end
+    end
+
+    test "change_survey_template/1 returns a survey_template changeset" do
+      survey_template = survey_template_fixture()
+      assert %Ecto.Changeset{} = Survey.change_survey_template(survey_template)
+    end
+  end
 end

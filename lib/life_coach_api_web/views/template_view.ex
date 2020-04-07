@@ -31,6 +31,7 @@ defmodule LifeCoachApiWeb.TemplateView do
 
   def render("quest.json", %{template: question}) do
     %{
+      id: question.id,
       statement: question.statement,
       type: question.type,
       weight: question.weight,

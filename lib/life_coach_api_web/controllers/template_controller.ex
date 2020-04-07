@@ -33,6 +33,7 @@ defmodule LifeCoachApiWeb.TemplateController do
   end
 
   def update(conn, %{"id" => id, "template" => template_params}) do
+    user = Guardian.Plug.current_resource(conn)
     template = Survey.get_template!(id)
 
     with {:ok, %Template{} = template} <- Survey.update_template(template, template_params) do
@@ -51,6 +52,12 @@ defmodule LifeCoachApiWeb.TemplateController do
   def user_template_lists(conn, _) do
     user = Guardian.Plug.current_resource(conn)
     templates = Survey.user_templates(user)
+    render(conn, "index.json", templates: templates)
+  end
+
+  def user_creator_template_lists(conn, %{"creator_id" => creator_id}) do
+    user = Guardian.Plug.current_resource(conn)
+    templates = Survey.user_creator_templates(user, creator_id)
     render(conn, "index.json", templates: templates)
   end
 

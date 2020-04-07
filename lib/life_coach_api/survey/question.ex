@@ -12,7 +12,7 @@ defmodule LifeCoachApi.Survey.Question do
 
     timestamps()
     belongs_to :template, LifeCoachApi.Survey.Template
-    embeds_many(:options, LifeCoachApi.Survey.Option)
+    embeds_many(:options, LifeCoachApi.Survey.Option, on_replace: :delete)
   end
 
   @doc false

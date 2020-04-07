@@ -50,6 +50,7 @@ defmodule LifeCoachApiWeb.Router do
     scope "/templates" do
       get "/my_templates/coach", TemplateController, :coach_template_lists
       get "/my_templates/user", TemplateController, :user_template_lists
+      get "/my_templates/user/:creator_id", TemplateController, :user_creator_template_lists
     end
 
     resources "/questions", QuestionController, except: [:new, :edit]
@@ -64,6 +65,10 @@ defmodule LifeCoachApiWeb.Router do
       post "/:template_id/bulk_upsert", ResponseController, :bulk_upsert
     end
 
+    resources "/survey_templates", SurveyTemplateController, except: [:new, :edit]
+    scope "/survey_templates" do
+      get "/create_and_share_survey/:template_id/:user_id", SurveyTemplateController, :create_and_share_survey
+    end
     
   end
 end

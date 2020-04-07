@@ -75,6 +75,7 @@ defmodule LifeCoachApi.Survey do
   """
   def update_template(%Template{} = template, attrs) do
     template
+    |> Repo.preload([:questions])
     |> Template.changeset(attrs)
     |> Repo.update()
   end
@@ -349,5 +350,160 @@ defmodule LifeCoachApi.Survey do
       Template
       |> where([template], template.user_id == ^user.id)
       |> Repo.all()
+  end
+
+  alias LifeCoachApi.Survey.SurveyTemplate
+
+  @doc """
+  Returns the list of survey_templates.
+
+  ## Examples
+
+      iex> list_survey_templates()
+      [%SurveyTemplate{}, ...]
+
+  """
+  def list_survey_templates do
+    Repo.all(SurveyTemplate)
+  end
+
+  def user_creator_templates(user, creator_id) do
+    IO.inspect user
+    res = Repo.all from st in SurveyTemplate, where: st.creator_id == ^creator_id and st.user_id == ^user.id
+    res
+  end
+  @doc """
+  Gets a single survey_template.
+
+  Raises `Ecto.NoResultsError` if the Survey template does not exist.
+
+  ## Examples
+
+      iex> get_survey_template!(123)
+      %SurveyTemplate{}
+
+      iex> get_survey_template!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_survey_template!(id), do: Repo.get!(SurveyTemplate, id)
+
+  def get_survey_template_with_questions(id) do 
+    template = Repo.get!(SurveyTemplate, id) |> Repo.preload([:survey_questions])
+    IO.inspect(template)
+    template
+  end
+
+  @doc """
+  Creates a survey_template.
+
+  ## Examples
+
+      iex> create_survey_template(%{field: value})
+      {:ok, %SurveyTemplate{}}
+
+      iex> create_survey_template(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_survey_template(attrs \\ %{}) do
+    %SurveyTemplate{}
+    |> SurveyTemplate.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a survey_template.
+
+  ## Examples
+
+      iex> update_survey_template(survey_template, %{field: new_value})
+      {:ok, %SurveyTemplate{}}
+
+      iex> update_survey_template(survey_template, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_survey_template(%SurveyTemplate{} = survey_template, attrs) do
+    survey_template
+    |> SurveyTemplate.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a survey_template.
+
+  ## Examples
+
+      iex> delete_survey_template(survey_template)
+      {:ok, %SurveyTemplate{}}
+
+      iex> delete_survey_template(survey_template)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_survey_template(%SurveyTemplate{} = survey_template) do
+    Repo.delete(survey_template)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking survey_template changes.
+
+  ## Examples
+
+      iex> change_survey_template(survey_template)
+      %Ecto.Changeset{source: %SurveyTemplate{}}
+
+  """
+  def change_survey_template(%SurveyTemplate{} = survey_template) do
+    SurveyTemplate.changeset(survey_template, %{})
+  end
+
+  def create_survey_template_by_template_and_user(template_id, user_id) do
+    template = Repo.get(Template, template_id) |> Repo.preload([:questions])
+    survey_template = %{"name": template.name, "user_id": 1, creator_id: template.user_id}  
+    survey_questions = Enum.map(template.questions, fn q -> %{
+      statement: q.statement, 
+      value: q.value, 
+      weight: q.weight, 
+      sequence: q.sequence, 
+      type: q.type, 
+      options: Enum.map(q.options, fn o -> %{
+        label: o.label, 
+        test: o.test, 
+        value: o.value
+      } end)
+    } end)
+    new_survey_template = Map.put(survey_template, :survey_questions, survey_questions) 
+    %SurveyTemplate{} 
+    |> SurveyTemplate.changeset(new_survey_template) 
+    |> Repo.insert()  
+  end
+
+  def list_feedbacks_by_survey_template(template_id, user_id) do
+    res = Repo.all from r in Response, where: r.survey_template_id == ^template_id and r.user_id == ^user_id, preload: [:question]
+    res |> Enum.map(fn(r) ->  Map.put(r.question, :value, r.value) end) |> Enum.sort_by(&(&1.sequence))
+  end
+
+  def bulk_upsert_responses(template_id, user, feedbacks) do
+    timestamp = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+    survey_template = Repo.get!(SurveyTemplate, String.to_integer(template_id))
+    new_feedback_params = feedbacks |> Enum.map(fn(fb) -> 
+      %{
+        survey_question_id: fb["id"], 
+        value: fb["value"], 
+        template_id: survey_template.template_id, 
+        survey_template_id: survey_template.id,
+        user_id: user.id, 
+        weight: fb["weight"], 
+        type: fb["type"], 
+        rating: 0, 
+        inserted_at: timestamp, 
+        updated_at: timestamp
+      } 
+    end)
+    Repo.insert_all(Response, new_feedback_params, on_conflict: :nothing)
+    res = Repo.all from r in Response, where: r.template_id == ^String.to_integer(template_id), preload: [:question]
+    res |> Enum.map(fn(r) ->  Map.put(r.question, :value, r.value) end)
   end
 end

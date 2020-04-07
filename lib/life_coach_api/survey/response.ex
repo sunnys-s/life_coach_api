@@ -13,7 +13,8 @@ defmodule LifeCoachApi.Survey.Response do
 
     timestamps()
 
-    belongs_to :question, LifeCoachApi.Survey.Question
+    belongs_to :survey_question, LifeCoachApi.Survey.SurveyQuestion
+    belongs_to :survey_template, LifeCoachApi.Survey.SurveyTemplate
     belongs_to :template, LifeCoachApi.Survey.Template
   end
 
