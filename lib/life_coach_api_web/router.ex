@@ -50,12 +50,13 @@ defmodule LifeCoachApiWeb.Router do
     scope "/templates" do
       get "/my_templates/coach", TemplateController, :coach_template_lists
       get "/my_templates/user", TemplateController, :user_template_lists
-      get "/my_templates/user/:creator_id", TemplateController, :user_creator_template_lists
+      get "/my_templates/user/:creator_id/:user_id", TemplateController, :user_creator_template_lists
     end
 
     resources "/questions", QuestionController, except: [:new, :edit]
     scope "/questions" do
       get "/template_questions/:template_id", QuestionController, :template_questions
+      get "/survey_template_questions/:template_id", QuestionController, :survey_template_questions
       post "/template_feedbacks/:template_id", QuestionController, :bulk_upsert
     end
 

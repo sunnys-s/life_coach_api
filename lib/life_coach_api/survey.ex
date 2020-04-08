@@ -353,6 +353,7 @@ defmodule LifeCoachApi.Survey do
   end
 
   alias LifeCoachApi.Survey.SurveyTemplate
+  alias LifeCoachApi.Survey.SurveyQuestion
 
   @doc """
   Returns the list of survey_templates.
@@ -367,9 +368,8 @@ defmodule LifeCoachApi.Survey do
     Repo.all(SurveyTemplate)
   end
 
-  def user_creator_templates(user, creator_id) do
-    IO.inspect user
-    res = Repo.all from st in SurveyTemplate, where: st.creator_id == ^creator_id and st.user_id == ^user.id
+  def user_creator_templates(user_id, creator_id) do
+    res = Repo.all from st in SurveyTemplate, where: st.creator_id == ^creator_id and st.user_id == ^user_id
     res
   end
   @doc """
@@ -461,7 +461,7 @@ defmodule LifeCoachApi.Survey do
 
   def create_survey_template_by_template_and_user(template_id, user_id) do
     template = Repo.get(Template, template_id) |> Repo.preload([:questions])
-    survey_template = %{"name": template.name, "user_id": 1, creator_id: template.user_id}  
+    survey_template = %{"name": template.name, "user_id": user_id, creator_id: template.user_id}  
     survey_questions = Enum.map(template.questions, fn q -> %{
       statement: q.statement, 
       value: q.value, 
@@ -480,9 +480,14 @@ defmodule LifeCoachApi.Survey do
     |> Repo.insert()  
   end
 
+  def list_survey_questions_by_template(template_id) do
+    query = from q in SurveyQuestion, where: q.survey_template_id == ^template_id, order_by: q.sequence
+    Repo.all(query)
+  end
+
   def list_feedbacks_by_survey_template(template_id, user_id) do
-    res = Repo.all from r in Response, where: r.survey_template_id == ^template_id and r.user_id == ^user_id, preload: [:question]
-    res |> Enum.map(fn(r) ->  Map.put(r.question, :value, r.value) end) |> Enum.sort_by(&(&1.sequence))
+    res = Repo.all from r in Response, where: r.survey_template_id == ^template_id and r.user_id == ^user_id, preload: [:survey_question]
+    res |> Enum.map(fn(r) ->  Map.put(r.survey_question, :value, r.value) end) |> Enum.sort_by(&(&1.sequence))
   end
 
   def bulk_upsert_responses(template_id, user, feedbacks) do
@@ -503,7 +508,7 @@ defmodule LifeCoachApi.Survey do
       } 
     end)
     Repo.insert_all(Response, new_feedback_params, on_conflict: :nothing)
-    res = Repo.all from r in Response, where: r.template_id == ^String.to_integer(template_id), preload: [:question]
-    res |> Enum.map(fn(r) ->  Map.put(r.question, :value, r.value) end)
+    res = Repo.all from r in Response, where: r.template_id == ^String.to_integer(template_id), preload: [:survey_question]
+    res |> Enum.map(fn(r) ->  Map.put(r.survey_question, :value, r.value) end)
   end
 end

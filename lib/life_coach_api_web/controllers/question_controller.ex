@@ -16,6 +16,11 @@ defmodule LifeCoachApiWeb.QuestionController do
     render(conn, "index.json", questions: questions)
   end
 
+  def survey_template_questions(conn, %{"template_id" => template_id}) do
+    questions = Survey.list_survey_questions_by_template(template_id)
+    render(conn, "survey_index.json", questions: questions)
+  end
+
 
   def create(conn, %{"question" => question_params}) do
     with {:ok, %Question{} = question} <- Survey.create_question(question_params) do

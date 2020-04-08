@@ -23,6 +23,23 @@ defmodule LifeCoachApiWeb.QuestionView do
     }
   end
 
+  def render("survey_index.json", %{questions: questions}) do
+    %{data: render_many(questions, QuestionView, "survey_question.json")}
+  end  
+
+  def render("survey_question.json", %{question: question}) do
+    %{
+      id: question.id,
+      statement: question.statement,
+      type: question.type,
+      weight: question.weight,
+      value: question.value,
+      template_id: question.survey_template_id,
+      sequence: question.sequence,
+      options: render_many(question.options, QuestionView, "option.json")
+    }
+  end
+
   def render("option.json", %{question: option}) do
     %{
       label: option.label,

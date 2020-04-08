@@ -55,9 +55,9 @@ defmodule LifeCoachApiWeb.TemplateController do
     render(conn, "index.json", templates: templates)
   end
 
-  def user_creator_template_lists(conn, %{"creator_id" => creator_id}) do
+  def user_creator_template_lists(conn, %{"creator_id" => creator_id, "user_id" => user_id}) do
     user = Guardian.Plug.current_resource(conn)
-    templates = Survey.user_creator_templates(user, creator_id)
+    templates = Survey.user_creator_templates(user_id, creator_id)
     render(conn, "index.json", templates: templates)
   end
 
