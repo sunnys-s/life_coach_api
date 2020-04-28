@@ -486,7 +486,7 @@ defmodule LifeCoachApi.Survey do
   end
 
   def list_feedbacks_by_survey_template(template_id, user_id) do
-    res = Repo.all from r in Response, where: r.survey_template_id == ^template_id and r.user_id == ^user_id, preload: [:survey_question]
+    res = Repo.all from r in Response, where: r.survey_template_id == ^template_id, preload: [:survey_question]
     res |> Enum.map(fn(r) ->  Map.put(r.survey_question, :value, r.value) end) |> Enum.sort_by(&(&1.sequence))
   end
 

@@ -23,6 +23,10 @@ defmodule LifeCoachApiWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    get "/invitations", InvitationController, :index
+    get "/register", InvitationController, :new
+    post "/register", InvitationController, :register
+    get "/registration_success", InvitationController, :registration_success
   end
 
 

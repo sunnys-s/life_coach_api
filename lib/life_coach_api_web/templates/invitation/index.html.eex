@@ -1,0 +1,10 @@
+<h1> Index Invitation </h1>
+<table>
+<%= for invitaion <- @invitaions do %>
+ <tr>
+  <td></td>
+  <td>world</td>
+ </tr>
+<% end %>
+
+</table>
