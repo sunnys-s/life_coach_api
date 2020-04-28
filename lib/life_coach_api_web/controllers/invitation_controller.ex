@@ -21,7 +21,8 @@ defmodule LifeCoachApiWeb.InvitationController do
         %{"user" => user_params} = _params
         %{"invite" => invite_params} = _params
         {:ok, %User{} = user} = Accounts.create_user(user_params)
-        {:ok, %Invitaion{} = invitaion} = Invitaion.create_invite(%{invited_by_id: invite_params["invited_by_user_id"], registered_user_id: 1})
+        IO.inspect(user)
+        {:ok, %Invitaion{} = invitaion} = Invitaion.create_invite(%{invited_by_id: invite_params["invited_by_user_id"], registered_user_id: user.id})
         conn |> redirect(to: "/registration_success")
     end
 
