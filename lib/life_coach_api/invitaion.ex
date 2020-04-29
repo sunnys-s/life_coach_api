@@ -3,12 +3,12 @@ defmodule LifeCoachApi.Invitaion do
   import Ecto.Changeset
 
   schema "invitaions" do
-    field :invited_by_id, :integer
-    field :registered_user_id, :integer
+    # field :invited_by_id, :integer
+    # field :registered_user_id, :integer
 
     timestamps()
-    #belongs_to :invited_by, LifeCoachApi.Accounts.User
-    #belongs_to :registered_user, LifeCoachApi.Accounts.User
+    belongs_to :invited_by, LifeCoachApi.Accounts.User
+    belongs_to :registered_user, LifeCoachApi.Accounts.User
   end
 
   alias LifeCoachApi.Invitaion
