@@ -16,7 +16,7 @@
                         <H5>I am a </h5>
                         <div class="row">
                           <div class="col-6" style="text-align:center">
-                            <label><input type="radio" name="user[user_type]" value="user" />User</label>
+                            <label><input type="radio" name="user[user_type]" value="user" checked required="required" />User</label>
                           </div>
                           <div class="col-6" style="text-align:center">
                             <label><input type="radio" name="user[user_type]" value="coach"/>Coach</label>

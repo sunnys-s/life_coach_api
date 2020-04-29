@@ -18,15 +18,19 @@ defmodule LifeCoachApiWeb.InvitationController do
     end
 
     def register(conn, _params) do 
-        %{"user" => user_params} = _params
-        %{"invite" => invite_params} = _params
-        {:ok, %User{} = user} = Accounts.create_user(user_params)
-        IO.inspect(user)
-        {:ok, %Invitaion{} = invitaion} = Invitaion.create_invite(%{invited_by_id: invite_params["invited_by_user_id"], registered_user_id: user.id})
-        conn |> redirect(to: "/registration_success")
+        case Recaptcha.verify(_params["g-recaptcha-response"]) do
+            {:ok, response} -> 
+                %{"user" => user_params} = _params
+                %{"invite" => invite_params} = _params
+                {:ok, %User{} = user} = Accounts.create_user(user_params)
+                {:ok, %Invitaion{} = invitaion} = Invitaion.create_invite(%{invited_by_id: invite_params["invited_by_user_id"], registered_user_id: user.id})
+                conn |> redirect(to: "/registration_success")
+            {:error, errors} -> conn |> render("new.html")
+        end
     end
 
     def registration_success(conn, _params) do 
         conn |> render("registration_success.html")
     end
+
 end 
