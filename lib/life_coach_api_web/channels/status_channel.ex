@@ -18,7 +18,7 @@ defmodule LifeCoachApiWeb.StatusChannel do
   
     def handle_info(:after_join, socket) do
       user = Repo.get!(User, socket.assigns.user_id)
-      users = Accounts.list_users(user)
+      users = Accounts.contact_users(user)
       push socket, "init:status_msg", %{users: users}
       Presence.track(socket, socket.assigns.user_id, %{})
       {:noreply, socket}

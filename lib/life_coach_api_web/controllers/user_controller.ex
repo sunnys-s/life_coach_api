@@ -87,6 +87,8 @@ defmodule LifeCoachApiWeb.UserController do
   end
 
   def users_of_contacts(conn, _params) do
-    render(conn, "users_of_contacts.json")
+    user = Guardian.Plug.current_resource(conn)
+    users = Accounts.contact_users(user)
+    render(conn, "index.json", users: users)
   end
 end
