@@ -45,6 +45,7 @@ defmodule LifeCoachApi.Accounts do
         sent_at: sent_at
       }
     end)
+    IO.inspect(user_list)
     Enum.sort_by(user_list, &(&1.sent_at)) |> Enum.reverse
     
   end
@@ -52,17 +53,19 @@ defmodule LifeCoachApi.Accounts do
   def contact_users(user) do 
     # query = from m in Conversation, where: m.user_id== 13 and m.opponent_id == 1 and m.is_read == false
     # Repo.aggregate(query, :count)
-    conversations = Repo.preload(user, :conversations).conversations
-                    |>Repo.preload(:opponent)
-                    |>Repo.preload(:user)
-    IO.inspect(conversations)
-    users = Enum.map(conversations, fn conversation -> 
-      if(conversation.user_id == user.id) do
-          conversation.opponent
-      else
-        conversation.user
-      end
-    end)
+    # conversations = Repo.preload(user, :conversations).conversations
+    #                 |>Repo.preload(:opponent)
+    #                 |>Repo.preload(:user)
+    # IO.inspect("conversation")
+    # IO.inspect(conversations)
+    # users = Enum.map(conversations, fn conversation -> 
+    #   if(conversation.user_id == user.id) do 
+    #       conversation.opponentt
+    #   else
+    #     conversation.user
+    #   end
+    # end)s
+    users = Repo.all(from u in User, where: u.user_type != ^user.user_type)
     user_list = users |> Enum.map(fn u -> 
       query = from m in Conversation, where: m.opponent_id== ^user.id and m.user_id == ^u.id and m.is_read == false
       query_d = from m in Conversation, where: m.opponent_id== ^user.id and m.user_id == ^u.id and m.is_read == false, order_by: [desc: m.sent_at]
@@ -80,6 +83,7 @@ defmodule LifeCoachApi.Accounts do
         sent_at: sent_at
       }
     end)
+    IO.inspect(user_list)
     Enum.sort_by(user_list, &(&1.sent_at)) |> Enum.reverse
 
 
