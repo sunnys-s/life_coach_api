@@ -45,7 +45,6 @@ defmodule LifeCoachApi.Accounts do
         sent_at: sent_at
       }
     end)
-    IO.inspect(user_list)
     Enum.sort_by(user_list, &(&1.sent_at)) |> Enum.reverse
     
   end
@@ -241,6 +240,50 @@ defmodule LifeCoachApi.Accounts do
     |> Profile.changeset(attrs)
     |> Repo.insert()
   end
+
+  def send_otp(mobile_number) do
+       set_otp(mobile_number)
+  end
+
+  def set_otp(mobile_number) do
+    case Repo.get_by(User, mobile_number: mobile_number) do 
+      nil -> 
+         {:error, "Invalid Mobile Number"}
+      user -> 
+          user 
+            |> User.changeset(%{otp: "#{Enum.random(11111..99999)}"})
+            |> Repo.update() 
+          {:ok, user}
+        
+    end
+  end
+
+  def verify_otp(mobile_number, otp) do 
+     case Repo.get_by(User, mobile_number: mobile_number) do 
+      nil -> 
+        {:error, "User not found"}
+      user -> 
+          if user.otp == otp do 
+            {:ok, "Valid otp"}
+          else 
+            {:error, "Invalid otp"}
+          end
+      end
+  end
+
+  def change_password(mobile_number, new_password) do 
+    case Repo.get_by(User, mobile_number: mobile_number) do 
+      nil -> 
+        {:error, "User not found"}
+      user -> 
+          user 
+            |> User.changeset(%{password: new_password})
+            |> Repo.update()
+          {:ok, user}
+             
+    end
+  end
+
 
 
 

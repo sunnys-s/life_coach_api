@@ -76,7 +76,6 @@ defmodule LifeCoachApiWeb.UserController do
 
   def upsert_templates(conn, %{"id" => id, "user" => user_params}) do
     user = Accounts.get_user!(id)
-    IO.inspect user_params
     with {:ok, %User{} = user} <- Accounts.insert_template_users(user, user_params["template_ids"]) do
       render(conn, "show.json", user: user)
     end
@@ -90,5 +89,32 @@ defmodule LifeCoachApiWeb.UserController do
     user = Guardian.Plug.current_resource(conn)
     users = Accounts.contact_users(user)
     render(conn, "index.json", users: users)
+  end
+
+  def otp_for_change_password(conn, %{"mobile_number"=> mobile_number}) do 
+    {response, user} = Accounts.send_otp(mobile_number)
+    if response == :ok do
+      json(conn,%{success: true})
+    else 
+      json(conn,%{success: false, message: user})
+    end
+  end
+
+  def verify_otp(conn, %{"mobile_number"=> mobile_number, "otp"=> otp}) do 
+      {response, user} = Accounts.verify_otp(mobile_number, otp)
+      if response == :ok do 
+        json(conn,%{success: true})
+      else 
+        json(conn,%{success: false, message: user})
+      end
+  end
+
+  def change_password(conn, %{"mobile_number"=> mobile_number, "new_password"=> new_password}) do 
+    {response, user} = Accounts.change_password(mobile_number, new_password)
+    if response == :ok do 
+      json(conn, %{success: true})
+    else 
+      json(conn, %{success: false, message: user})
+    end
   end
 end

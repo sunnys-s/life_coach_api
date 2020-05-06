@@ -29,6 +29,7 @@ defmodule LifeCoachApiWeb.UserView do
       sent_at: user[:sent_at]
     }
   end
+  
 
   def render("jwt.json", %{jwt: jwt, user: user}) do
     %{

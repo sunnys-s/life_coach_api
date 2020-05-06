@@ -16,9 +16,12 @@ defmodule LifeCoachApi.Accounts.User do
     field :password_confirmation, :string, virtual: true
     field :profile_picture, :string
     field :user_type, :string
+    field :otp, :string
+    field :mobile_number, :string
     timestamps()
 
     has_many :conversations, LifeCoachApi.Conversation
+    has_many :received_conversations, LifeCoachApi.Conversation, foreign_key: :opponent_id
     has_many :survey_templates, LifeCoachApi.Survey.SurveyTemplate
 
     many_to_many(
@@ -33,12 +36,14 @@ defmodule LifeCoachApi.Accounts.User do
   @doc false
   def changeset(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:name, :email, :password, :password_confirmation, :profile_picture, :user_type])
+    |> cast(attrs, [:name, :email, :password, :password_confirmation, :profile_picture, :user_type, :otp, :mobile_number])
     # |> validate_required([:email, :password, :password_confirmation])
     |> validate_format(:email, ~r/@/)
     |> validate_length(:password, min: 8)
     |> validate_confirmation(:password)
+    |> validate_required([:mobile_number])
     |> unique_constraint(:email)
+    |> unique_constraint(:mobile_number)
     |> put_password_hash
   end
 
@@ -59,9 +64,6 @@ defmodule LifeCoachApi.Accounts.User do
   end
 
   defp put_profile_picture(changeset) do
-    IO.puts "---------------------------------------"
-    IO.inspect changeset
-    IO.puts "---------------------------------------"
     case changeset do
       %Ecto.Changeset{changes: %{profile_picture: avatar}}
         ->

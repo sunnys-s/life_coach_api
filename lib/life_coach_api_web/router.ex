@@ -42,6 +42,9 @@ defmodule LifeCoachApiWeb.Router do
     put "/users/:id", UserController, :update
     put "/users/:id/images", UserController, :update_image
     put "/users/:id/upsert_templates", UserController, :upsert_templates
+    post "/otp_for_change_password", UserController, :otp_for_change_password
+    post "/verify_otp", UserController, :verify_otp
+    post "/change_password", UserController, :change_password
   end
   
   scope "/api/v1", LifeCoachApiWeb do
