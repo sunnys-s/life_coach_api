@@ -23,6 +23,10 @@ defmodule LifeCoachApiWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    get "/invitations", InvitationController, :index
+    get "/register", InvitationController, :new
+    post "/register", InvitationController, :register
+    get "/registration_success", InvitationController, :registration_success
   end
 
 
@@ -34,17 +38,17 @@ defmodule LifeCoachApiWeb.Router do
 
     post "/sign_up", UserController, :create
     post "/sign_in", UserController, :sign_in
-    get "/user_conversations", UserController, :user_conversations
-    get "/users_of_contacts", UserController, :users_of_contacts
     # get "/users", UserController, :index
     put "/users/:id", UserController, :update
     put "/users/:id/images", UserController, :update_image
     put "/users/:id/upsert_templates", UserController, :upsert_templates
   end
-
+  
   scope "/api/v1", LifeCoachApiWeb do
     pipe_through [:api, :jwt_authenticated]
     get "/users", UserController, :index
+    get "/users_of_contacts", UserController, :users_of_contacts
+    get "/user_conversations", UserController, :user_conversations
     get "/my_user", UserController, :show
     resources "/templates", TemplateController, except: [:new, :edit]
     scope "/templates" do

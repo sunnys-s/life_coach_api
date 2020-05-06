@@ -1,0 +1,44 @@
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-md-6 offset-md-3">
+            <br>
+            <br>
+            <div class="col-12" style="text-align:center">
+                 <img src="<%= Routes.static_path(@conn, "/images/SuperCoach.png") %>" alt="Phoenix Framework Logo"/>
+            </div>
+            <br>
+            <div class="card">
+             <div class="card-body">
+                <form action="/register" method="post">
+                    <input type="hidden" value="<%= @token %>" name="_csrf_token"/>
+                    <input type="hidden" name="invite[invited_by_user_id]" value="<%=@invite%>"/>
+                    <div class="form-group">
+                        <H5>I am a </h5>
+                        <div class="row">
+                          <div class="col-6" style="text-align:center">
+                            <label><input type="radio" name="user[user_type]" value="user" checked required="required" />User</label>
+                          </div>
+                          <div class="col-6" style="text-align:center">
+                            <label><input type="radio" name="user[user_type]" value="coach"/>Coach</label>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="user[email]" class="form-control" placeholder="Phone or Email"/>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="user[password]" class="form-control" placeholder="Password"/>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="user[name]" class="form-control" placeholder="Your name"/>
+                    </div>
+                    <div class="form-group" style="text-align:center">
+                        <%= raw Recaptcha.Template.display %>
+                    </div>
+                    <input type="submit" class="btn btn-success form-control" value="Done">
+                </form>
+             </div>
+            </div>
+        </div>
+     </div>
+</div>

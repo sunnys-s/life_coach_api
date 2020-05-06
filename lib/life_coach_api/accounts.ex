@@ -49,6 +49,42 @@ defmodule LifeCoachApi.Accounts do
     
   end
 
+  def contact_users(user) do 
+    # query = from m in Conversation, where: m.user_id== 13 and m.opponent_id == 1 and m.is_read == false
+    # Repo.aggregate(query, :count)
+    conversations = Repo.preload(user, :conversations).conversations
+                    |>Repo.preload(:opponent)
+                    |>Repo.preload(:user)
+    IO.inspect(conversations)
+    users = Enum.map(conversations, fn conversation -> 
+      if(conversation.user_id == user.id) do
+          conversation.opponent
+      else
+        conversation.user
+      end
+    end)
+    user_list = users |> Enum.map(fn u -> 
+      query = from m in Conversation, where: m.opponent_id== ^user.id and m.user_id == ^u.id and m.is_read == false
+      query_d = from m in Conversation, where: m.opponent_id== ^user.id and m.user_id == ^u.id and m.is_read == false, order_by: [desc: m.sent_at]
+      query_sent_at = from m in Conversation, where: ((m.opponent_id== ^user.id and m.user_id == ^u.id) or (m.opponent_id== ^u.id and m.user_id == ^user.id)), order_by: [desc: m.sent_at]
+      count = Repo.aggregate(query, :count)
+      last = Repo.all(query_sent_at) |> List.first
+      sent_at = if last == nil, do: nil, else: last.sent_at
+      %{
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        profile_picture: u.profile_picture,
+        user_type: u.user_type,
+        count: count,
+        sent_at: sent_at
+      }
+    end)
+    Enum.sort_by(user_list, &(&1.sent_at)) |> Enum.reverse
+
+
+  end
+
   @doc """
   Gets a single user.
 
@@ -211,6 +247,8 @@ defmodule LifeCoachApi.Accounts do
     |> Profile.changeset(attrs)
     |> Repo.insert()
   end
+
+
 
   @doc """
   Updates a profile.
