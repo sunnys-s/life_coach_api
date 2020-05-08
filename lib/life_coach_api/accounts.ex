@@ -10,6 +10,7 @@ defmodule LifeCoachApi.Accounts do
   alias LifeCoachApi.Survey.Template
   alias LifeCoachApi.Accounts
   alias LifeCoachApi.Conversation
+  alias LifeCoachApi.Accounts.Sms
 
   alias LifeCoachApi.Guardian
   import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
@@ -242,7 +243,11 @@ defmodule LifeCoachApi.Accounts do
   end
 
   def send_otp(mobile_number) do
-       set_otp(mobile_number)
+       {response, user} = set_otp(mobile_number)
+       if response == :ok do 
+          Sms.send_sms(mobile_number, user.otp)
+       end
+       {response, user}
   end
 
   def set_otp(mobile_number) do

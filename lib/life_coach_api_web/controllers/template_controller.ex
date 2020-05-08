@@ -21,20 +21,20 @@ defmodule LifeCoachApiWeb.TemplateController do
       |> render("show.json", template: template)
     end
   end
-
+  
   # def show(conn, %{"id" => id}) do
-  #   template = Survey.get_template!(id)
-  #   render(conn, "show.json", template: template)
-  # end
-
-  def show(conn, %{"id" => id}) do
-    template = Survey.get_template_with_questions(id)
-    render(conn, "template_show.json", template: template)
-  end
-
-  def update(conn, %{"id" => id, "template" => template_params}) do
-    user = Guardian.Plug.current_resource(conn)
-    template = Survey.get_template!(id)
+    #   template = Survey.get_template!(id)
+    #   render(conn, "show.json", template: template)
+    # end
+    
+    def show(conn, %{"id" => id}) do
+      template = Survey.get_template_with_questions(id)
+      render(conn, "template_show.json", template: template)
+    end
+    
+    def update(conn, %{"id" => id, "template" => template_params}) do
+      user = Guardian.Plug.current_resource(conn)
+      template = Survey.get_template!(id)
 
     with {:ok, %Template{} = template} <- Survey.update_template(template, template_params) do
       render(conn, "show.json", template: template)

@@ -20,7 +20,8 @@ defmodule LifeCoachApi.MixProject do
   def application do
     [
       mod: {LifeCoachApi.Application, []},
-      extra_applications: [:logger, :runtime_tools, :recaptcha]
+      extra_applications: [:logger, :runtime_tools, :recaptcha],
+      application: [:httpoison]
     ]
   end
 
@@ -53,6 +54,7 @@ defmodule LifeCoachApi.MixProject do
       {:hackney, "~> 1.9"},
       {:uuid, "~> 1.1"},
       {:recaptcha, "~> 3.0"},
+      {:httpoison, "~> 1.6"},
     ]
   end
 
